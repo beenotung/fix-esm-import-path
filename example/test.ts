@@ -1,4 +1,4 @@
-import { Cat } from './cat.js'
+import { Cat } from './cat'
 
 let kitty = new Cat()
 kitty.speak()

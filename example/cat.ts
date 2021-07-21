@@ -1,4 +1,4 @@
-import { Animal } from './animal.js'
+import { Animal } from './animal'
 
 export class Cat extends Animal {
   speak() {

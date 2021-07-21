@@ -5,18 +5,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "run-s tsc fix:*",
+    "build": "run-s tsc fix",
+    "test": "run-s build js",
     "tsc": "tsc -p .",
-    "fix:ts": "fix-esm-import-path test.ts",
-    "fix:js": "fix-esm-import-path dist/test.js"
+    "fix": "fix-esm-import-path dist/test.js",
+    "js": "node dist/test"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "fix-esm-import-path": "link:.."
-  },
   "devDependencies": {
+    "fix-esm-import-path": "link:..",
     "npm-run-all": "^4.1.5",
     "ts-node": "^10.1.0",
     "typescript": "^4.3.5"

@@ -154,6 +154,10 @@ function resolveImportFile(file) {
     return file
   }
   for (let jsExt of ['.js', '.jsx']) {
+    let jsFile = file + jsExt
+    if (isFileExists(jsFile)) {
+      return jsFile
+    }
     for (let tsExt of ['.ts', '.tsx']) {
       let tsFile = file + tsExt
       if (isFileExists(tsFile)) {
