@@ -6,6 +6,15 @@ Auto fix import path for esm compatibility.
 
 This cli tool modifies specified Typescript / Javascript files recursively. It appends `.js` extension on the import statements of relative module path.
 
+## Installation
+```bash
+## for cli
+npm install --global fix-esm-import-path
+
+## for npm script
+npm install fix-esm-import-path
+```
+
 ## Usage
 ```bash
 fix-esm-import-path <file>
@@ -13,7 +22,7 @@ fix-esm-import-path <file>
 
 Example on shell:
 ```bash
-fix-esm-import-path dist/server/index.js
+npx fix-esm-import-path dist/server/index.js
 ```
 
 Example on npm script (in `package.json`):
