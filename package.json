@@ -1,0 +1,21 @@
+{
+  "name": "fix-esm-import-path",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Auto fix import path for esm compatibility.",
+  "keywords": [
+    "esm",
+    "auto-fix",
+    "import path",
+    "module",
+    "cli"
+  ],
+  "author": "Beeno Tung <aabbcc1241@yahoo.com.hk> (https://beeno-tung.surge.sh)",
+  "license": "BSD-2-Clause",
+  "bin": {
+    "fix-esm-import-path": "fix-esm-import-path.js"
+  },
+  "dependencies": {
+    "debug": "^4.3.2"
+  }
+}
