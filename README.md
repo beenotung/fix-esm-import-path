@@ -4,7 +4,7 @@ Auto fix import path for esm compatibility.
 
 [![npm Package Version](https://img.shields.io/npm/v/fix-esm-import-path.svg?maxAge=2592000)](https://www.npmjs.com/package/fix-esm-import-path)
 
-This cli tool modifies specified Typescript / Javascript files recursively. It appends `.js` extension on the import statements of relative module path.
+This cli tool modifies specified Typescript / Javascript files recursively. It appends `.js` extension on the import / export statements of relative module path.
 
 ## Installation
 ```bash

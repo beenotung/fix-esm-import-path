@@ -1,4 +1,4 @@
-import { Cat } from './cat'
+import { Cat } from './index'
 
 let kitty = new Cat()
 kitty.speak()

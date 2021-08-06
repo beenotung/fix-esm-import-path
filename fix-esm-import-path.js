@@ -191,6 +191,8 @@ function scanFile({ srcFile }) {
   for (let regex of [
     /.*import .* from '(.*)'.*/g,
     /.*import .* from "(.*)".*/g,
+    /.*export .* from '(.*)'.*/g,
+    /.*export .* from "(.*)".*/g,
   ]) {
     for (let match of code.matchAll(regex)) {
       let [importCode, name] = match
