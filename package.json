@@ -17,5 +17,13 @@
   },
   "dependencies": {
     "debug": "^4.3.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/beenotung/fix-esm-import-path.git"
+  },
+  "bugs": {
+    "url": "https://github.com/beenotung/fix-esm-import-path/issues"
+  },
+  "homepage": "https://github.com/beenotung/fix-esm-import-path#readme"
 }
