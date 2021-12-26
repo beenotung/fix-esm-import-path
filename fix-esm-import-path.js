@@ -186,7 +186,7 @@ let visit_file_set = new Set()
 function scanFile({ srcFile }) {
   if (visit_file_set.has(srcFile)) return
   visit_file_set.add(srcFile)
-  log('scanFile:', srcFile)
+  log('[scanFile]', { srcFile })
   let code = fs.readFileSync(srcFile).toString()
   for (let regex of [
     /.*import .* from '(.*)'.*/g,
