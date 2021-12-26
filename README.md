@@ -17,7 +17,7 @@ npm install fix-esm-import-path
 
 ## Usage
 ```bash
-fix-esm-import-path <file>
+fix-esm-import-path <file-or-directory>
 ```
 
 Example on shell:

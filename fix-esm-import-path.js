@@ -3,15 +3,15 @@ import fs from 'fs'
 import path from 'path'
 import debug from 'debug'
 
-let entryFile = process.argv[2]
+let entryPoint = process.argv[2]
 
-if (!entryFile) {
-  console.error('missing entryFile in argument')
+if (!entryPoint) {
+  console.error('missing entryPoint in argument')
   process.exit(1)
 }
-if (!fs.existsSync(entryFile)) {
-  let name = JSON.stringify(entryFile)
-  console.error(`entryFile ${name} does not exist`)
+if (!fs.existsSync(entryPoint)) {
+  let name = JSON.stringify(entryPoint)
+  console.error(`entryPoint ${name} does not exist`)
   process.exit(1)
 }
 
@@ -202,6 +202,26 @@ function scanFile({ srcFile }) {
   }
 }
 
-scanFile({ srcFile: entryFile })
+function scanEntryPoint(file) {
+  log('[scanEntryPoint]', { file })
+  let stat = fs.statSync(file)
+  if (stat.isFile()) {
+    if (file.endsWith('.js') || file.endsWith('.ts')) {
+      scanFile({ srcFile: file })
+    }
+    // e.g. package.json, .gitignore
+    return
+  }
+  if (stat.isDirectory()) {
+    fs.readdirSync(file).forEach(filename => {
+      scanEntryPoint(path.join(file, filename))
+    })
+    return
+  }
+  // e.g. socket file
+  console.log('skip unsupported file:', file)
+}
+
+scanEntryPoint(entryPoint)
 
 console.log('done.')
