@@ -1,6 +1,6 @@
 {
   "name": "fix-esm-import-path",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "type": "module",
   "description": "Auto fix import path for esm compatibility.",
   "keywords": [
@@ -17,5 +17,13 @@
   },
   "dependencies": {
     "debug": "^4.3.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/beenotung/fix-esm-import-path.git"
+  },
+  "bugs": {
+    "url": "https://github.com/beenotung/fix-esm-import-path/issues"
+  },
+  "homepage": "https://github.com/beenotung/fix-esm-import-path#readme"
 }
