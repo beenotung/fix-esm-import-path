@@ -214,6 +214,7 @@ function scanEntryPoint(file) {
   }
   if (stat.isDirectory()) {
     fs.readdirSync(file).forEach(filename => {
+      if (filename == 'node_modules') return
       scanEntryPoint(path.join(file, filename))
     })
     return
