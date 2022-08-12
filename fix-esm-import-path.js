@@ -3,15 +3,26 @@ import fs from 'fs'
 import path from 'path'
 import debug from 'debug'
 
-let entryPoint = process.argv[2]
+let entryPoints = []
+let missingFiles = []
 
-if (!entryPoint) {
-  console.error('missing entryPoint in argument')
+for (let i = 2; i < process.argv.length; i++) {
+  let entryPoint = process.argv[i]
+  if (fs.existsSync(entryPoint)) {
+    entryPoints.push(entryPoint)
+  } else {
+    missingFiles.push(entryPoint)
+  }
+}
+
+if (missingFiles.length > 0) {
+  let name = missingFiles.map(name => JSON.stringify(name)).join(', ')
+  console.error(`entryPoint ${name} does not exist`)
   process.exit(1)
 }
-if (!fs.existsSync(entryPoint)) {
-  let name = JSON.stringify(entryPoint)
-  console.error(`entryPoint ${name} does not exist`)
+
+if (entryPoints.length === 0) {
+  console.error('missing entryPoint in argument')
   process.exit(1)
 }
 
@@ -223,6 +234,8 @@ function scanEntryPoint(file) {
   console.log('skip unsupported file:', file)
 }
 
-scanEntryPoint(entryPoint)
+for (let entryPoint of entryPoints) {
+  scanEntryPoint(entryPoint)
+}
 
 console.log('done.')
