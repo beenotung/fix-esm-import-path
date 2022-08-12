@@ -1,3 +1,4 @@
 example/
 pnpm-lock.yaml
 *.tgz
+.dccache
