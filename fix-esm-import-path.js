@@ -61,7 +61,9 @@ async function scanModule({ srcFile, importCode, name }) {
   }
   let dir = await findNodeModuleDir(srcFile, name)
   if (dir) {
-    let mainFile = (await isFileExists(dir)) ? dir : await getModuleEntryFile(dir)
+    let mainFile = (await isFileExists(dir))
+      ? dir
+      : await getModuleEntryFile(dir)
     return scanModuleMainFile({ file: mainFile })
   }
 
@@ -112,7 +114,10 @@ async function scanImport({ srcFile, importCode, name }) {
     process.exit(1)
   }
   let ext_list = ['.js', '.jsx', '.ts', 'tsx']
-  if (!importFile.startsWith(importName + '/index') && !ext_list.some(ext => importName.endsWith(ext))) {
+  if (
+    !importFile.startsWith(importName + '/index') &&
+    !ext_list.some(ext => importName.endsWith(ext))
+  ) {
     for (let ext of ext_list) {
       if (!importName.endsWith('.js') && importFile.endsWith(ext)) {
         log(`[scanImport] fix import:`, {
@@ -217,9 +222,9 @@ async function scanEntryPoint(file) {
   if (stat.isDirectory()) {
     await fs.readdir(file).then(files =>
       Promise.all(
-        files.map(async filename => {
+        files.map(filename => {
           if (filename == 'node_modules') return
-          await scanEntryPoint(path.join(file, filename))
+          return scanEntryPoint(path.join(file, filename))
         })
       )
     )
