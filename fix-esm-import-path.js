@@ -1,41 +1,21 @@
 #!/usr/bin/env node
-import fs from 'fs'
+import fs from 'fs/promises'
 import path from 'path'
 import debug from 'debug'
 
 let entryPoints = []
 let missingFiles = []
 
-for (let i = 2; i < process.argv.length; i++) {
-  let entryPoint = process.argv[i]
-  if (fs.existsSync(entryPoint)) {
-    entryPoints.push(entryPoint)
-  } else {
-    missingFiles.push(entryPoint)
-  }
-}
-
-if (missingFiles.length > 0) {
-  let name = missingFiles.map(name => JSON.stringify(name)).join(', ')
-  console.error(`entryPoint ${name} does not exist`)
-  process.exit(1)
-}
-
-if (entryPoints.length === 0) {
-  console.error('missing entryPoint in argument')
-  process.exit(1)
-}
-
 let log = debug('fix-esm-import-path')
 // log.enabled = true
 
-function findNodeModuleDir(srcFile, name) {
+async function findNodeModuleDir(srcFile, name) {
   let dir = path.dirname(srcFile)
   for (;;) {
-    let files = fs.readdirSync(dir)
+    let files = await fs.readdir(dir)
     if (files.includes('node_modules')) {
       let moduleDir = path.join(dir, 'node_modules', name)
-      if (fs.existsSync(moduleDir)) {
+      if (await isExists(moduleDir)) {
         return moduleDir
       }
     }
@@ -46,23 +26,23 @@ function findNodeModuleDir(srcFile, name) {
   }
 }
 
-function getModuleEntryFile(dir) {
+async function getModuleEntryFile(dir) {
   let entryFile = 'index.js'
-  let files = fs.readdirSync(dir)
+  let files = await fs.readdir(dir)
   if (files.includes('package.json')) {
-    let text = fs.readFileSync(path.join(dir, 'package.json')).toString()
+    let text = await fs.readFile(path.join(dir, 'package.json'), 'utf8')
     let pkg = JSON.parse(text)
     entryFile = pkg.module || pkg.main || entryFile
   }
   return path.join(dir, entryFile)
 }
 
-function fixImport({ srcFile, importCode, from, to }) {
+async function fixImport({ srcFile, importCode, from, to }) {
   let newImportCode = importCode.replace(from, to)
   log(`[fixImport]`, { srcFile, importCode, from, to })
-  let code = fs.readFileSync(srcFile).toString()
+  let code = await fs.readFile(srcFile, 'utf8')
   code = code.replace(importCode, newImportCode)
-  fs.writeFileSync(srcFile, code)
+  await fs.writeFile(srcFile, code, 'utf8')
   return newImportCode
 }
 
@@ -71,7 +51,7 @@ function scanModuleMainFile({ file }) {
   // log(`[scanModuleMainFile] TODO`, { file })
 }
 
-function scanModule({ srcFile, importCode, name }) {
+async function scanModule({ srcFile, importCode, name }) {
   let numOfDirInName = name.split('/').length - 1
   if (name.includes('@')) {
     numOfDirInName--
@@ -79,23 +59,23 @@ function scanModule({ srcFile, importCode, name }) {
   if (numOfDirInName == 0) {
     return
   }
-  let dir = findNodeModuleDir(srcFile, name)
+  let dir = await findNodeModuleDir(srcFile, name)
   if (dir) {
-    let mainFile = isFileExists(dir) ? dir : getModuleEntryFile(dir)
+    let mainFile = (await isFileExists(dir)) ? dir : await getModuleEntryFile(dir)
     return scanModuleMainFile({ file: mainFile })
   }
 
   let jsName = name + '.js'
-  let jsFile = findNodeModuleDir(srcFile, jsName)
+  let jsFile = await findNodeModuleDir(srcFile, jsName)
   if (!jsFile) {
     console.error(`Error: cannot resolve module`, {
       name,
       srcFile,
-      importCode,
+      importCode
     })
     process.exit(1)
   }
-  fixImport({ srcFile, importCode, from: name, to: jsName })
+  await fixImport({ srcFile, importCode, from: name, to: jsName })
   scanModuleMainFile({ file: jsFile })
 }
 
@@ -116,68 +96,79 @@ function resolveImportName({ srcFile, name }) {
   return { type: 'module', name }
 }
 
-function scanImport({ srcFile, importCode, name }) {
+async function scanImport({ srcFile, importCode, name }) {
   let { type, name: importName } = resolveImportName({ srcFile, name })
   if (type == 'module') {
-    return scanModule({ srcFile, importCode, name })
+    return await scanModule({ srcFile, importCode, name })
   }
-  let importFile = resolveImportFile(importName)
+  let importFile = await resolveImportFile(importName)
   if (!importFile) {
     console.error(`[scanImport] File not found:`, {
       srcFile,
       importName,
       importCode,
-      name,
+      name
     })
     process.exit(1)
   }
   let ext_list = ['.js', '.jsx', '.ts', 'tsx']
-  if (
-    !importFile.startsWith(importName + '/index') &&
-    !ext_list.some(ext => importName.endsWith(ext))
-  ) {
+  if (!importFile.startsWith(importName + '/index') && !ext_list.some(ext => importName.endsWith(ext))) {
     for (let ext of ext_list) {
       if (!importName.endsWith('.js') && importFile.endsWith(ext)) {
         log(`[scanImport] fix import:`, {
           srcFile,
           importCode,
           importName,
-          importFile,
+          importFile
         })
-        importCode = fixImport({
+        importCode = await fixImport({
           srcFile,
           importCode,
           from: name,
-          to: name + '.js',
+          to: name + '.js'
         })
         break
       }
     }
   }
-  return scanFile({ srcFile: importFile })
+  return await scanFile({ srcFile: importFile })
 }
 
 function isFileExists(file) {
-  return fs.existsSync(file) && fs.statSync(file).isFile()
+  return isExists(file).then(() => isFile(file))
 }
 
-function resolveImportFile(file) {
-  if (isFileExists(file)) {
+function isFile(file) {
+  return fs
+    .stat(file)
+    .then(v => v.isFile())
+    .catch(() => false)
+}
+
+function isExists(file) {
+  return fs
+    .access(file)
+    .then(() => true)
+    .catch(() => false)
+}
+
+async function resolveImportFile(file) {
+  if (await isFileExists(file)) {
     return file
   }
   for (let jsExt of ['.js', '.jsx']) {
     let jsFile = file + jsExt
-    if (isFileExists(jsFile)) {
+    if (await isFileExists(jsFile)) {
       return jsFile
     }
     for (let tsExt of ['.ts', '.tsx']) {
       let tsFile = file + tsExt
-      if (isFileExists(tsFile)) {
+      if (await isFileExists(tsFile)) {
         return tsFile
       }
       if (file.endsWith(jsExt)) {
         tsFile = file.slice(0, file.length - jsExt.length) + tsExt
-        if (isFileExists(tsFile)) {
+        if (await isFileExists(tsFile)) {
           return tsFile
         }
       }
@@ -186,7 +177,7 @@ function resolveImportFile(file) {
 
   for (let indexFile of ['index.js', 'index.jsx', 'index.ts', 'index.tsx']) {
     indexFile = path.join(file, indexFile)
-    if (isFileExists(indexFile)) {
+    if (await isFileExists(indexFile)) {
       return indexFile
     }
   }
@@ -194,48 +185,77 @@ function resolveImportFile(file) {
 }
 
 let visit_file_set = new Set()
-function scanFile({ srcFile }) {
+async function scanFile({ srcFile }) {
   if (visit_file_set.has(srcFile)) return
   visit_file_set.add(srcFile)
   log('[scanFile]', { srcFile })
-  let code = fs.readFileSync(srcFile).toString()
+  let code = await fs.readFile(srcFile, 'utf8')
   for (let regex of [
     /.*import .* from '(.*)'.*/g,
     /.*import .* from "(.*)".*/g,
     /.*export .* from '(.*)'.*/g,
-    /.*export .* from "(.*)".*/g,
+    /.*export .* from "(.*)".*/g
   ]) {
     for (let match of code.matchAll(regex)) {
       let [importCode, name] = match
       if (importCode.includes('import type')) continue
-      scanImport({ srcFile, importCode, name })
+      await scanImport({ srcFile, importCode, name })
     }
   }
 }
 
-function scanEntryPoint(file) {
+async function scanEntryPoint(file) {
   log('[scanEntryPoint]', { file })
-  let stat = fs.statSync(file)
+  let stat = await fs.stat(file)
   if (stat.isFile()) {
     if (file.endsWith('.js') || file.endsWith('.ts')) {
-      scanFile({ srcFile: file })
+      await scanFile({ srcFile: file })
     }
     // e.g. package.json, .gitignore
     return
   }
   if (stat.isDirectory()) {
-    fs.readdirSync(file).forEach(filename => {
-      if (filename == 'node_modules') return
-      scanEntryPoint(path.join(file, filename))
-    })
+    await fs.readdir(file).then(files =>
+      Promise.all(
+        files.map(async filename => {
+          if (filename == 'node_modules') return
+          await scanEntryPoint(path.join(file, filename))
+        })
+      )
+    )
     return
   }
   // e.g. socket file
   console.log('skip unsupported file:', file)
 }
 
-for (let entryPoint of entryPoints) {
-  scanEntryPoint(entryPoint)
+async function start() {
+  await Promise.all(
+    process.argv.slice(2).map(entryPoint =>
+      isExists(entryPoint).then(exist => {
+        if (exist) {
+          entryPoints.push(entryPoint)
+        } else {
+          missingFiles.push(entryPoint)
+        }
+      })
+    )
+  )
+
+  if (missingFiles.length > 0) {
+    let name = missingFiles.map(name => JSON.stringify(name)).join(', ')
+    console.error(`entryPoint ${name} does not exist`)
+    process.exit(1)
+  }
+
+  if (entryPoints.length === 0) {
+    console.error('missing entryPoint in argument')
+    process.exit(1)
+  }
+
+  await Promise.all(entryPoints.map(entryPoint => scanEntryPoint(entryPoint)))
+
+  console.log('done.')
 }
 
-console.log('done.')
+start()
