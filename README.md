@@ -9,11 +9,11 @@ This cli tool modifies specified Typescript / Javascript files recursively. It a
 ## Installation
 
 ```bash
-## for cli
+## for global cli
 npm install --global fix-esm-import-path
 
 ## for npm script
-npm install fix-esm-import-path
+npm install -D fix-esm-import-path
 ```
 
 ## Usage
