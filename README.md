@@ -19,8 +19,29 @@ npm install -D fix-esm-import-path
 ## Usage
 
 ```bash
-fix-esm-import-path <file-or-directory>
+fix-esm-import-path [options] <file-or-directory>
 ```
+
+### Options
+
+`--process-import-type`: To add `.js` extension in the import path of `import type` statements when needed.
+
+`--preserve-import-type`: To preserve the import path of `import type` statements as is.
+
+Default mode is `--process-import-type`.
+
+<details>
+<summary>(Click to expand the reason)</summary>
+
+In previous version, `fix-esm-import-path` does not modify the import path of `import type` statements because they are supposed to be removed in the javascript output.
+
+However, [under some settings](https://github.com/beenotung/fix-esm-import-path/issues/5), import path with extension is required for `import type` statements as well. So now `fix-esm-import-path` now modifies the import path of `import type` statements as well.
+
+If your setup does not require fixing the import path for `import type` statements and you want to minimize git changes, you can use the `--preserve-import-type` flag to leave them as is.
+
+</details>
+
+### Usage Example
 
 Example on shell:
 
@@ -56,6 +77,7 @@ Details refer to [example](./example)
 - [Appending .js extension on relative import statements during Typescript compilation (ES6 modules)](https://stackoverflow.com/questions/62619058/appending-js-extension-on-relative-import-statements-during-typescript-compilat)
 - [Provide a way to add the '.js' file extension to the end of module specifiers](https://github.com/microsoft/TypeScript/issues/16577)
 - [[FEATURE] absolute->relative module path transformation](https://github.com/microsoft/TypeScript/issues/15479)
+- [Support TypeScript import type when targeting ESNext with NodeNext module](https://github.com/beenotung/fix-esm-import-path/issues/5)
 
 ## License
 

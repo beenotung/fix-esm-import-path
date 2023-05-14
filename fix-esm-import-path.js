@@ -3,11 +3,21 @@ import fs from 'fs'
 import path from 'path'
 import debug from 'debug'
 
+let processImportType = true
 let entryPoints = []
 let missingFiles = []
 
 for (let i = 2; i < process.argv.length; i++) {
-  let entryPoint = process.argv[i]
+  let arg = process.argv[i]
+  if (arg === '--preserve-import-type') {
+    processImportType = false
+    continue
+  }
+  if (arg === '--process-import-type') {
+    processImportType = true
+    continue
+  }
+  let entryPoint = arg
   if (fs.existsSync(entryPoint)) {
     entryPoints.push(entryPoint)
   } else {
@@ -207,7 +217,7 @@ function scanFile({ srcFile }) {
   ]) {
     for (let match of code.matchAll(regex)) {
       let [importCode, name] = match
-      if (importCode.includes('import type')) continue
+      if (!processImportType && importCode.includes('import type')) continue
       scanImport({ srcFile, importCode, name })
     }
   }
