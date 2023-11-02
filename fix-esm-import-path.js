@@ -221,6 +221,7 @@ function scanFile({ srcFile }) {
   ]) {
     for (let match of code.matchAll(regex)) {
       let [importCode, name] = match
+      if (importCode.startsWith('//')) continue // skip comment
       if (!processImportType && importCode.includes('import type')) continue
       scanImport({ srcFile, importCode, name })
     }
