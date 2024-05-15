@@ -216,6 +216,8 @@ function scanFile({ srcFile }) {
   for (let regex of [
     /.*import .* from '(.*?)'.*/g,
     /.*import .* from "(.*?)".*/g,
+    /.*import "(.*?)".*/g,
+    /.*import '(.*?)'.*/g,
     /.*export .* from '(.*?)'.*/g,
     /.*export .* from "(.*?)".*/g,
   ]) {
