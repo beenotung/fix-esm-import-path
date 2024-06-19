@@ -15,6 +15,9 @@
   "bin": {
     "fix-esm-import-path": "fix-esm-import-path.js"
   },
+  "files": [
+    "fix-esm-import-path.js"
+  ],
   "dependencies": {
     "debug": "^4.3.2"
   },
