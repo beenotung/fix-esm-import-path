@@ -130,6 +130,10 @@ function resolveImportName({ srcFile, name }) {
   return { type: 'module', name }
 }
 
+let js_ext_list = ['.js', '.jsx']
+let ts_ext_list = ['.ts', 'tsx']
+let ext_list = [...js_ext_list, ...ts_ext_list]
+
 function scanImport({ srcFile, importCode, name }) {
   let { type, name: importName } = resolveImportName({ srcFile, name })
   if (type == 'module') {
@@ -145,7 +149,6 @@ function scanImport({ srcFile, importCode, name }) {
     })
     process.exit(1)
   }
-  let ext_list = ['.js', '.jsx', '.ts', 'tsx']
   if (!ext_list.some(ext => importName.endsWith(ext))) {
     for (let ext of ext_list) {
       if (!importName.endsWith('.js') && importFile.endsWith(ext)) {
@@ -178,12 +181,12 @@ function resolveImportFile(file) {
   if (isFileExists(file)) {
     return file
   }
-  for (let jsExt of ['.js', '.jsx']) {
+  for (let jsExt of js_ext_list) {
     let jsFile = file + jsExt
     if (isFileExists(jsFile)) {
       return jsFile
     }
-    for (let tsExt of ['.ts', '.tsx']) {
+    for (let tsExt of ts_ext_list) {
       let tsFile = file + tsExt
       if (isFileExists(tsFile)) {
         return tsFile
