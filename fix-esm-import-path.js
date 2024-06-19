@@ -169,6 +169,20 @@ function scanImport({ srcFile, importCode, name }) {
         break
       }
     }
+  } else {
+    ext: for (let js_ext of js_ext_list) {
+      for (let ts_ext of ts_ext_list) {
+        if (importName.endsWith(ts_ext) && importFile.endsWith(js_ext)) {
+          importCode = fixImport({
+            srcFile,
+            importCode,
+            from: name,
+            to: name.slice(0, name.length - ts_ext.length) + js_ext,
+          })
+          break ext
+        }
+      }
+    }
   }
   return scanFile({ srcFile: importFile })
 }
@@ -206,6 +220,13 @@ function resolveImportFile(file) {
       return indexFile
     }
   }
+
+  for (let tsExt of ts_ext_list) {
+    if (file.endsWith(tsExt)) {
+      return resolveImportFile(file.slice(0, file.length - tsExt.length))
+    }
+  }
+
   return null
 }
 
