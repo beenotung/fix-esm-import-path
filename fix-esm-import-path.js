@@ -82,8 +82,8 @@ function scanModuleMainFile({ file }) {
 }
 
 function scanModule({ srcFile, importCode, name }) {
-  if (name.startsWith('node:')) {
-    // e.g. 'node:fs/promises'
+  if (name.startsWith('node:') || !name.startsWith('/')) {
+    // e.g. 'node:fs/promises' or 'fs/promises'
     return
   }
   let numOfDirInName = name.split('/').length - 1
