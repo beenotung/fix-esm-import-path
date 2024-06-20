@@ -244,10 +244,10 @@ function scanFile({ srcFile }) {
     /.*export .* from '(.*?)'.*/g,
     /.*export .* from "(.*?)".*/g,
     // handle multi-line import/export with bracket, suggested by fox1t
-    /.*import\s*{[^}]*}\s*from\s*'(.*?)'.*/g,
-    /.*import\s*{[^}]*}\s*from\s*"(.*?)".*/g,
-    /.*export\s*{[^}]*}\s*from\s*'(.*?)'.*/g,
-    /.*export\s*{[^}]*}\s*from\s*"(.*?)".*/g,
+    /.*import\s*(?:type\s*)?{[^}]*}\s*from\s*'(.*?)'.*/g,
+    /.*import\s*(?:type\s*)?{[^}]*}\s*from\s*"(.*?)".*/g,
+    /.*export\s*(?:type\s*)?{[^}]*}\s*from\s*'(.*?)'.*/g,
+    /.*export\s*(?:type\s*)?{[^}]*}\s*from\s*"(.*?)".*/g,
   ]) {
     for (let match of code.matchAll(regex)) {
       let [importCode, name] = match
