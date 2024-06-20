@@ -117,12 +117,12 @@ function resolveImportName({ srcFile, name }) {
   if (name.startsWith('/')) {
     return { type: 'absolute', name }
   }
-  if (name.startsWith('./')) {
+  if (name.startsWith('./') || name === '.') {
     let dir = path.dirname(srcFile)
     name = path.join(dir, name)
     return { type: 'relative', name }
   }
-  if (name.startsWith('../')) {
+  if (name.startsWith('../') || name === '..') {
     let dir = path.dirname(srcFile)
     name = path.join(dir, name)
     return { type: 'relative', name }
