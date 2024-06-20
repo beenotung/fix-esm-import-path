@@ -28,6 +28,5 @@
   "bugs": {
     "url": "https://github.com/beenotung/fix-esm-import-path/issues"
   },
-  "homepage": "https://github.com/beenotung/fix-esm-import-path#readme",
-  "packageManager": "pnpm@7.14.2+sha512.352c6b21a456d3b8c5410d5f3c514e03c78c7eea20b0c7b280e29ddf3685832241768d6887ad6397626359cfb0d17373588306effbfd1caee73fc4532f934ede"
+  "homepage": "https://github.com/beenotung/fix-esm-import-path#readme"
 }
