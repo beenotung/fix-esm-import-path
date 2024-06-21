@@ -82,8 +82,8 @@ function scanModuleMainFile({ file }) {
 }
 
 function scanModule({ srcFile, importCode, name }) {
-  if (name.startsWith('node:')) {
-    // e.g. 'node:fs/promises'
+  if (name.startsWith('node:') || !name.startsWith('/')) {
+    // e.g. 'node:fs/promises' or 'fs/promises'
     return
   }
   let numOfDirInName = name.split('/').length - 1
@@ -117,12 +117,12 @@ function resolveImportName({ srcFile, name }) {
   if (name.startsWith('/')) {
     return { type: 'absolute', name }
   }
-  if (name.startsWith('./')) {
+  if (name.startsWith('./') || name === '.') {
     let dir = path.dirname(srcFile)
     name = path.join(dir, name)
     return { type: 'relative', name }
   }
-  if (name.startsWith('../')) {
+  if (name.startsWith('../') || name === '..') {
     let dir = path.dirname(srcFile)
     name = path.join(dir, name)
     return { type: 'relative', name }
@@ -244,10 +244,10 @@ function scanFile({ srcFile }) {
     /.*export .* from '(.*?)'.*/g,
     /.*export .* from "(.*?)".*/g,
     // handle multi-line import/export with bracket, suggested by fox1t
-    /.*import\s*{[^}]*}\s*from\s*'(.*?)'.*/g,
-    /.*import\s*{[^}]*}\s*from\s*"(.*?)".*/g,
-    /.*export\s*{[^}]*}\s*from\s*'(.*?)'.*/g,
-    /.*export\s*{[^}]*}\s*from\s*"(.*?)".*/g,
+    /.*import\s*(?:type\s*)?{[^}]*}\s*from\s*'(.*?)'.*/g,
+    /.*import\s*(?:type\s*)?{[^}]*}\s*from\s*"(.*?)".*/g,
+    /.*export\s*(?:type\s*)?{[^}]*}\s*from\s*'(.*?)'.*/g,
+    /.*export\s*(?:type\s*)?{[^}]*}\s*from\s*"(.*?)".*/g,
   ]) {
     for (let match of code.matchAll(regex)) {
       let [importCode, name] = match
