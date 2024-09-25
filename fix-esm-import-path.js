@@ -131,7 +131,7 @@ function resolveImportName({ srcFile, name }) {
 }
 
 let js_ext_list = ['.js', '.jsx']
-let ts_ext_list = ['.ts', 'tsx']
+let ts_ext_list = ['.ts', '.tsx']
 let ext_list = [...js_ext_list, ...ts_ext_list]
 
 function scanImport({ srcFile, importCode, name }) {
