@@ -162,7 +162,7 @@ function scanImport({ srcFile, importCode, name }) {
           srcFile,
           importCode,
           from: name,
-          to: importFile.startsWith(importName + '/index')
+          to: importFile.startsWith(importName + path.sep + 'index')
             ? name + '/index.js'
             : name + '.js',
         })
