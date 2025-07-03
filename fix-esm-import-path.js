@@ -251,11 +251,23 @@ function scanFile({ srcFile }) {
   ]) {
     for (let match of code.matchAll(regex)) {
       let [importCode, name] = match
+      importCode = importCode.trim()
       if (importCode.startsWith('//')) continue // skip comment
+      if (!isImportCode(importCode)) continue // skip code generation pattern
       if (!processImportType && importCode.includes('import type')) continue
       scanImport({ srcFile, importCode, name })
     }
   }
+}
+
+/**
+ * check for code generation pattern, e.g.
+ * ```
+ * indexFile.write(`import * as ${NamePascal} from './${realName}/schema';\n`)
+ * ```
+ */
+function isImportCode(importCode) {
+  return importCode.startsWith('import ')
 }
 
 function scanEntryPoint(file) {
