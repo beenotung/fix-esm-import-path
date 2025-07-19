@@ -1,6 +1,6 @@
 {
   "name": "fix-esm-import-path",
-  "version": "1.10.2",
+  "version": "1.10.3",
   "type": "module",
   "description": "Auto fix import path for esm compatibility.",
   "keywords": [
