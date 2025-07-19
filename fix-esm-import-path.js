@@ -267,7 +267,7 @@ function scanFile({ srcFile }) {
  * ```
  */
 function isImportCode(importCode) {
-  return importCode.startsWith('import ')
+  return importCode.startsWith('import ') || importCode.startsWith('export ')
 }
 
 function scanEntryPoint(file) {
